@@ -44,11 +44,12 @@ class LossRatePredictor(pl.LightningModule):
         x, y = train_batch
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-        self.log('train_loss', loss, prog_bar=True)
+        # self.log('train_loss', loss, prog_bar=True)
         return loss
 
     def validation_step(self, val_batch, batch_idx):
         x, y = val_batch
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-        self.log('val_loss', loss, prog_bar=True)
+        # self.log('val_loss', loss, prog_bar=True)
+        return loss

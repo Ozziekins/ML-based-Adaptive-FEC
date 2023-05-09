@@ -82,21 +82,21 @@ class Autoencoder(pl.LightningModule):
         return inertia
 
     def training_step(self, train_batch, batch_idx):
-        x, _ = train_batch
+        x = train_batch
         emb = self(x)
         x_hat = self.decoder(emb)
         loss = F.mse_loss(x_hat, x)
         loss_kmeans = self.kmeans_loss(emb)
         loss = loss + 0.1 * loss_kmeans
-        self.log('train_loss', loss, prog_bar=True)
+        # self.log('train_loss', loss, prog_bar=True)
         return loss
 
     def validation_step(self, val_batch, batch_idx):
-        x, _ = val_batch
+        x = val_batch
         emb = self(x)
         x_hat = self.decoder(emb)
         loss = F.mse_loss(x_hat, x)
         loss_kmeans = self.kmeans_loss(emb)
         loss = loss + 0.1 * loss_kmeans
-        self.log('val_loss', loss, prog_bar=True)
+        # self.log('val_loss', loss, prog_bar=True)
         return loss
