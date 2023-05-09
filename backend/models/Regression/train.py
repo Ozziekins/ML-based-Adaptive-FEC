@@ -1,13 +1,12 @@
 import os.path
 
-from backend.models import PREDICT_SIZE
+from backend.models import PREDICT_SIZE, NUM_CLUSTERS
 from backend.models.Regression import *
 from backend.models.Regression.Model import LossRatePredictor
 from backend.models.Regression.SequenceDataset import SequenceDataset
 from backend.definitions import ROOT_DIR
 import torch
 import pytorch_lightning as pl
-import numpy as np
 from torch.utils.data import random_split, DataLoader
 
 file_path = 'store/checkpoint.ckpt'
@@ -15,7 +14,7 @@ file_path = 'store/checkpoint.ckpt'
 
 def train_regressors(x, y, labels):
     models = {}
-    for i in range(3):
+    for i in range(NUM_CLUSTERS):
         subset = [index for index, label in enumerate(labels) if label == i]
         dataset = SequenceDataset(x[subset], y[subset])
         models[i] = train_regressor(dataset)

@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
 import numpy as np
@@ -64,3 +65,6 @@ class Preprocessor:
     def preprocess(self, data, input_size=INP_SIZE, gap_offset=INP_SIZE + GAP_SIZE, subset_len=SUB_LEN):
         data = self._preprocess(data)
         return self._generate_slides(data, input_size, gap_offset, subset_len)
+
+    def preprocess_predict(self, data):
+        return torch.from_numpy(data).float()
