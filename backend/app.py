@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi import File, UploadFile
 import os
+import uvicorn
 
 from backend.models.MLService import MLService
 
@@ -28,7 +29,6 @@ def train(file: UploadFile = File(...)):
     dataset = pd.read_csv(path)
     service.train(dataset)
 
-
     return {"message": f"Models successfully trained!"}
 
 
@@ -49,3 +49,6 @@ def predict(file: UploadFile = File(...)):
     except Exception:
         return {"message": "Models should be trained before making prediction!"}
 
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
