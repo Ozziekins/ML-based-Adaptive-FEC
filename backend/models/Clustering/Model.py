@@ -1,11 +1,8 @@
+import pytorch_lightning as pl
 import torch
+from kmeans_pytorch import kmeans
 from torch import nn
 from torch.nn import functional as F
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.data import random_split
-import pytorch_lightning as pl
-import numpy as np
-from kmeans_pytorch import kmeans
 
 
 class Encoder(nn.Module):
