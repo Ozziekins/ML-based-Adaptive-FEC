@@ -39,7 +39,7 @@ class LossRatePredictor(pl.LightningModule):
         return self.sequence(hidden) * 100
 
     def penalty_loss(self, y, y_hat):
-        return torch.sum(y_hat< y)/ y.shape[0]*y.shape[1]
+        return torch.sum(y_hat< y)/ (y.shape[0]*y.shape[1])
     
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
@@ -50,13 +50,15 @@ class LossRatePredictor(pl.LightningModule):
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
         penalty_loss = self.penalty_loss(y, y_hat)        
-        self.log('loss', loss, prog_bar=True, on_step=False, on_epoch=True)
+        self.log('Training loss', loss, on_step=False, on_epoch=True)        
+        self.log('Penalty loss', penalty_loss, on_step=False, on_epoch=True)
         return loss + penalty_loss
 
     def validation_step(self, val_batch, batch_idx):
         x, y = val_batch
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
+        # self.log('Val loss',loss,on_step=False, on_epoch=True)
         return loss
 
     # def on_train_epoch_end(self,  *arg, **kwargs):

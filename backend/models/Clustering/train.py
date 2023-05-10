@@ -1,13 +1,12 @@
-import copy
 import os
-import pickle
-import joblib
+from sklearn.cluster import KMeans
 
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import random_split, DataLoader
 
 from backend.definitions import ROOT_DIR
+from backend.models import NUM_CLUSTERS
 from backend.models.Clustering import *
 from backend.models.Clustering.ClusteringDataset import ClusteringDataset
 from backend.models.Clustering.Model import Autoencoder
@@ -36,10 +35,10 @@ def train_ae(x, model_state):
 
     return model   
 
-def kmeans_train(model, data):    
-    path = os.path.join(ROOT_DIR, "store", "KMeans")    
-    model = copy.deepcopy(model)
-    birch = model.partial_fit(data)
+def cluster_train(model, data):    
+    path = os.path.join(ROOT_DIR, "store", "cluster")    
+    model = KMeans(n_clusters=NUM_CLUSTERS, init="k-means++")
+    cluster_model = model.fit(data)
     os.makedirs(path, exist_ok=True)
-    torch.save(birch, os.path.join(path, 'model.pth'))
-    return birch
+    torch.save(cluster_model, os.path.join(path, 'model.pth'))
+    return cluster_model
