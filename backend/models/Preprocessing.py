@@ -32,7 +32,7 @@ class Preprocessor:
         # Dropping unnamed column
         data = data.drop(['Unnamed: 0'], axis=1)
         print(data.shape)
-        data = self.remove_outlier(data)
+        # data = self.remove_outlier(data)
         print(data.shape)
         # Removing outliers. Getting quantiles
         Q1 = data['dropped_frames'].quantile(0.001)
