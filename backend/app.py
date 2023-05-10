@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi import File, UploadFile
 import os
 
@@ -44,4 +44,15 @@ def predict(file: UploadFile = File(...)):
         return json.dumps(data.tolist())
     except Exception:
         return {"message": "Models should be trained before making prediction!"}
+
+
+@app.post("/predict/json")
+async def predict(request:Request):
+    try:
+        input = await request.json()
+        dataset = pd.read_json(input)
+        data = service.predict(np.expand_dims(dataset.to_numpy(),axis=0))
+        return json.dumps(data.tolist())
+    except Exception as ex:
+        raise HTTPException(status_code=404, detail="There was an error getting predictions")
 

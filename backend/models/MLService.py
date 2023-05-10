@@ -6,7 +6,6 @@ from backend.models.Clustering.load import load_autoencoder, load_birch
 from backend.models.Clustering.predict import autoencoder_embed
 from backend.models.Clustering.train import kmeans_train, train_ae
 from backend.models.Preprocessing import Preprocessor
-from backend.models.Regression.predict import regressor_predict
 from backend.models.Regression.train import train_regressors
 from backend.models.Regression.load import load_regressor
 
@@ -50,12 +49,13 @@ class MLService:
         with torch.no_grad():
             if self.AE:
                 x = self.preprocessor.preprocess_predict(data)
-                
                 embedding = autoencoder_embed(self.AE,x)
                 labels = self.birch.predict(embedding)
 
-                res = regressor_predict(self.regressors,x,labels) 
-
-                return np.vstack(res)
+                regressor = self.regressors[labels[0]]
+                regressor.eval()                
+                res = regressor(x) 
+                
+                return res[0]
             else:
                 raise Exception("Should be trained first!")
