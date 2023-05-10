@@ -1,4 +1,7 @@
+import copy
 import os
+import pickle
+import joblib
 
 import torch
 import pytorch_lightning as pl
@@ -9,8 +12,7 @@ from backend.models.Clustering import *
 from backend.models.Clustering.ClusteringDataset import ClusteringDataset
 from backend.models.Clustering.Model import Autoencoder
 
-
-def train_ae(x):
+def train_ae(x, model_state):
     dataset = ClusteringDataset(x)
 
     # Dataloaders
@@ -23,8 +25,21 @@ def train_ae(x):
 
     torch.set_float32_matmul_precision('medium')
     model = Autoencoder()
+    model.load_state_dict(model_state)
+    
+    model.train()
 
     root_dir = os.path.join(ROOT_DIR, "store", "Autoencoder")
     trainer = pl.Trainer(max_epochs=MAX_EPOCHS, devices=1, default_root_dir=root_dir)
-    trainer.fit(model, train_dataloader, val_dataloader)
-    return model.eval()
+    trainer.fit(model, train_dataloader, val_dataloader) 
+    torch.save(model.state_dict(), os.path.join(root_dir, 'model.pth'))    
+
+    return model   
+
+def kmeans_train(model, data):    
+    path = os.path.join(ROOT_DIR, "store", "KMeans")    
+    model = copy.deepcopy(model)
+    kmeans = model.partial_fit(data)
+    os.makedirs(path, exist_ok=True)
+    torch.save(kmeans, os.path.join(path, 'model.pth'))
+    return kmeans

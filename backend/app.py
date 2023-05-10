@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi import File, UploadFile
 import os
 
@@ -14,18 +14,14 @@ service = MLService()
 
 
 @app.post("/train")
-def train(file: UploadFile = File(...)):
+def train(file: UploadFile = File(...)):    
     try:
-        contents = file.file.read()
-        path = os.path.join("tmp", file.filename)
-        with open(path, 'wb+') as f:
-            f.write(contents)
-    except Exception:
-        return {"message": "There was an error getting training data"}
+        dataset = pd.read_csv(file.file)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="There was an error getting training data")
     finally:
         file.file.close()
-
-    dataset = pd.read_csv(path)
+        
     service.train(dataset)
 
 
