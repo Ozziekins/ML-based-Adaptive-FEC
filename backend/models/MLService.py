@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 from backend.models import NUM_CLUSTERS
-from backend.models.Clustering.load import load_autoencoder, load_kmeans
+from backend.models.Clustering.load import load_autoencoder, load_birch
 from backend.models.Clustering.predict import autoencoder_embed
 from backend.models.Clustering.train import kmeans_train, train_ae
 from backend.models.Preprocessing import Preprocessor
@@ -20,11 +20,11 @@ class MLService:
             ae = load_autoencoder()
 
         if kmeans is None:
-            kmeans = load_kmeans()
+            kmeans = load_birch()
         
         self.AE = ae
         self.regressors = regressors
-        self.kmeans = kmeans
+        self.birch = kmeans
         self.preprocessor = Preprocessor()
 
     def train(self, data):
@@ -37,14 +37,14 @@ class MLService:
         embeddings = ae(x).cpu().detach().numpy()
 
         # Preparing clusters    
-        kmeans = kmeans_train(self.kmeans, embeddings)
-        labels = kmeans.predict(embeddings)
+        birch = kmeans_train(self.birch, embeddings)
+        labels = birch.predict(embeddings)
 
         #Preparing regressors
         regressors = train_regressors(x, y, labels, {k: v.state_dict() for k,v in self.regressors.items()})
         
         # Rewriting the variables, so that we would not corrupt predict while training
-        self.AE, self.kmeans, self.regressors = ae, kmeans, regressors
+        self.AE, self.birch, self.regressors = ae, birch, regressors
 
     def predict(self, data):
         with torch.no_grad():
@@ -52,7 +52,7 @@ class MLService:
                 x = self.preprocessor.preprocess_predict(data)
                 
                 embedding = autoencoder_embed(self.AE,x)
-                labels = self.kmeans.predict(embedding)
+                labels = self.birch.predict(embedding)
 
                 res = regressor_predict(self.regressors,x,labels) 
 

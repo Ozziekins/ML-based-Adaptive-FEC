@@ -1,6 +1,6 @@
 import os
 import joblib
-from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import Birch
 
 import torch
 
@@ -16,11 +16,11 @@ def load_autoencoder():
         model.load_state_dict(torch.load(PATH))
     return model
 
-def load_kmeans():
+def load_birch():
     PATH = os.path.join(ROOT_DIR, "store", "KMeans", 'model.pth')    
     model = None
     if os.path.exists(PATH):
-        model = joblib.load(PATH)
+        model = torch.load(PATH)
     if model is None:
-        model = MiniBatchKMeans(n_clusters=NUM_CLUSTERS)
+        model = Birch(n_clusters=NUM_CLUSTERS)
     return model

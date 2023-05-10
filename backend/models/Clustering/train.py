@@ -39,7 +39,7 @@ def train_ae(x, model_state):
 def kmeans_train(model, data):    
     path = os.path.join(ROOT_DIR, "store", "KMeans")    
     model = copy.deepcopy(model)
-    kmeans = model.partial_fit(data)
+    birch = model.partial_fit(data)
     os.makedirs(path, exist_ok=True)
-    torch.save(kmeans, os.path.join(path, 'model.pth'))
-    return kmeans
+    torch.save(birch, os.path.join(path, 'model.pth'))
+    return birch
