@@ -19,9 +19,21 @@ class Preprocessor:
         data["loss_rate"] = data['loss_rate'] / 100
         return data
 
+    def remove_outlier(self,df):
+        s1 = set(df.query('dropped_frames == 0 and bitrate != 0 and RTT == 0')['session_id'].tolist())
+        s2 = set(df.query('bitrate == 0 and dropped_frames == 0 and RTT != 0')['session_id'].tolist())
+        s3 = set(df.query('bitrate == 0 and dropped_frames != 0 and RTT == 0')['session_id'].tolist())
+        s4 = set(df.query('bitrate != 0 and dropped_frames != 0 and RTT == 0')['session_id'].tolist())
+
+        bad = list(s1.union(s2).union(s3).union(s4))
+        return df[~df.session_id.isin(bad)]
+
     def _preprocess(self, data):
         # Dropping unnamed column
         data = data.drop(['Unnamed: 0'], axis=1)
+        print(data.shape)
+        data = self.remove_outlier(data)
+        print(data.shape)
         # Removing outliers. Getting quantiles
         Q1 = data['dropped_frames'].quantile(0.001)
         Q3 = data['dropped_frames'].quantile(0.999)
@@ -37,7 +49,7 @@ class Preprocessor:
 
         # Drop all rows from data that have matching client_user_id and session_id
         data = data[~data[['client_user_id', 'session_id']].isin(outliers_ids.to_dict('list')).all(1)]
-
+        print(data.shape)
         data = self._scale(data)
         return data
 

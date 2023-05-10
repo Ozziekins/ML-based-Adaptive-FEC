@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 
 from backend.models import NUM_CLUSTERS
 from backend.models.Clustering.load import load_autoencoder, load_birch
@@ -38,12 +37,12 @@ class MLService:
         # Preparing clusters    
         birch = kmeans_train(self.birch, embeddings)
         labels = birch.predict(embeddings)
-
-        #Preparing regressors
-        regressors = train_regressors(x, y, labels, {k: v.state_dict() for k,v in self.regressors.items()})
+        print(labels.unique())
+        # #Preparing regressors
+        # regressors = train_regressors(x, y, labels, {k: v.state_dict() for k,v in self.regressors.items()})
         
-        # Rewriting the variables, so that we would not corrupt predict while training
-        self.AE, self.birch, self.regressors = ae, birch, regressors
+        # # Rewriting the variables, so that we would not corrupt predict while training
+        # self.AE, self.birch, self.regressors = ae, birch, regressors
 
     def predict(self, data):
         with torch.no_grad():
