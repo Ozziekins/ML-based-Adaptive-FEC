@@ -37,7 +37,7 @@ def train_ae(x, model_state):
 
 def cluster_train(model, data):    
     path = os.path.join(ROOT_DIR, "store", "cluster")    
-    model = KMeans(n_clusters=NUM_CLUSTERS, init="k-means++")
+    model = KMeans(n_clusters=NUM_CLUSTERS, init="k-means++", random_state=42, n_init=10)
     cluster_model = model.fit(data)
     os.makedirs(path, exist_ok=True)
     torch.save(cluster_model, os.path.join(path, 'model.pth'))
