@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Request
 from fastapi import File, UploadFile
 import os
+import uvicorn
 
 from backend.models.MLService import MLService
 
@@ -23,7 +24,6 @@ def train(file: UploadFile = File(...)):
         file.file.close()
         
     service.train(dataset)
-
 
     return {"message": f"Models successfully trained!"}
 
@@ -56,3 +56,5 @@ async def predict(request:Request):
     except Exception as ex:
         raise HTTPException(status_code=404, detail="There was an error getting predictions")
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
