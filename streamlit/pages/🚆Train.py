@@ -1,40 +1,44 @@
 import streamlit as st
-import time
 import pandas as pd
-import uuid
+import requests
 
 st.title(
-    """Training Loop"""
+    """Train 🚆"""
 )
 
+# tab1 = st.tabs(['Train'])
+
+# with tab1:
 st.write("In this module, you can pass files and retrain our base model to suit your needs. Currently accepts only csv files.")
-uploaded_file = st.file_uploader("Choose a file",
-                                 type=['csv'],
-                                 accept_multiple_files=True)
+uploaded_file = st.file_uploader("Choose a file", type=['csv'])
 
 
 def on_click():
-    with st.spinner('Uploading dataset to the api'):
-        if 'intraining' not in st.session_state:
-            st.session_state['intraining'] = uuid.uuid4()
-            time.sleep(5)
-        else:
-            st.error("A Training Process is still occurring")
+    if uploaded_file is not None:
+        with st.spinner('Uploading dataset to the api'):
+            url = 'http://127.0.0.1:8000/train'
+            resp = requests.post(url=url, files={'file': uploaded_file})
+            if(resp.ok):
+                st.success("Successfully trained files")
+            else:
+                st.error("Error training files")
+            print(resp.content)
+    else:
+        st.error("File is empty")
 
 
 st.button("Start Training", on_click=on_click)
 
-st.header("Metrics")
+# with tab2:
+
+#     def get_metrics():
+#         return pd.DataFrame(
+#             data={
+#                 'description': ['Lorem Ipsum do ', 'Lorem ipsum do', 'Lorem ipsum do', 'Lorem ipsum do', ''],
+#                 'Values': [0, 1, 2, 3, 4],
+#             },
+#             index=['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4', 'Metric 5']
+#         )
 
 
-def get_metrics():
-    return pd.DataFrame(
-        data={
-            'description': ['Lorem Ipsum do ', 'Lorem ipsum do', 'Lorem ipsum do', 'Lorem ipsum do', ''],
-            'Values': [0, 1, 2, 3, 4],
-        },
-        index=['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4', 'Metric 5']
-    )
-
-
-st.dataframe(get_metrics(), use_container_width=True)
+#     st.dataframe(get_metrics(), use_container_width=True)

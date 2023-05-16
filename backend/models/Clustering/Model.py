@@ -4,6 +4,8 @@ from kmeans_pytorch import kmeans
 from torch import nn
 from torch.nn import functional as F
 
+from backend.models import DEVICE
+
 
 class Encoder(nn.Module):
 
@@ -60,7 +62,7 @@ class Autoencoder(pl.LightningModule):
         self.encoder = Encoder()
         self.decoder = Decoder()
         self.lr = lr
-        self.cuda = torch.device('cuda:0')
+        self.cuda = DEVICE
 
     def forward(self, x):
         return self.encoder(x)

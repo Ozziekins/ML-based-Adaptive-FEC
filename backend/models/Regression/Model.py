@@ -10,7 +10,8 @@ class LossRatePredictor(pl.LightningModule):
         self.learning_rate = learning_rate
         self.n_features = n_features
         self.hidden_dim = hidden_dim
-        self.lstm = nn.LSTM(input_size=n_features, hidden_size=hidden_dim, num_layers=n_layers, batch_first=True)
+        self.lstm = nn.LSTM(input_size=n_features, hidden_size=hidden_dim,
+                            num_layers=n_layers, batch_first=True)
         self.sequence = nn.Sequential(
             nn.Dropout(0.25),
             nn.BatchNorm1d(hidden_dim, affine=False),
@@ -37,19 +38,29 @@ class LossRatePredictor(pl.LightningModule):
         hidden = hidden[-1]
         return self.sequence(hidden) * 100
 
+    def penalty_loss(self, y, y_hat):
+        return torch.sum(y_hat< y)/ (y.shape[0]*y.shape[1])
+    
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
+        y = y*100
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-        # self.log('train_loss', loss, prog_bar=True)
-        return loss
+        penalty_loss = self.penalty_loss(y, y_hat)        
+        self.log('Training loss', loss, on_step=False, on_epoch=True)        
+        self.log('Penalty loss', penalty_loss, on_step=False, on_epoch=True)
+        return loss + penalty_loss
 
     def validation_step(self, val_batch, batch_idx):
         x, y = val_batch
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-        # self.log('val_loss', loss, prog_bar=True)
+        # self.log('Val loss',loss,on_step=False, on_epoch=True)
         return loss
+
+    # def on_train_epoch_end(self,  *arg, **kwargs):
+    #     print(arg, kwargs)
+    #     print("Epoch is ending")
