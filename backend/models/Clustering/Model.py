@@ -90,6 +90,8 @@ class Autoencoder(pl.LightningModule):
         loss = F.mse_loss(x_hat, x)
         loss_kmeans = self.kmeans_loss(emb)
         loss = loss + 0.1 * loss_kmeans
+        self.log('Training MSE loss', loss, on_step=False, on_epoch=True)        
+        self.log('Training kmeans loss', loss_kmeans, on_step=False, on_epoch=True)
         # self.log('train_loss', loss, prog_bar=True)
         return loss
 
@@ -100,5 +102,6 @@ class Autoencoder(pl.LightningModule):
         loss = F.mse_loss(x_hat, x)
         loss_kmeans = self.kmeans_loss(emb)
         loss = loss + 0.1 * loss_kmeans
-        # self.log('val_loss', loss, prog_bar=True)
+        self.log('Validation MSE loss', loss, on_step=False, on_epoch=True)        
+        self.log('Validation kmeans loss', loss_kmeans, on_step=False, on_epoch=True)
         return loss
