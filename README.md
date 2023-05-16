@@ -35,7 +35,7 @@ To get started with the LoudPlay Adaptive FEC for Cloud Gaming Service project, 
 4. Start the server using: 
     - `uvicorn backend.app:app --reload`.
 5. On another terminal, start the streamlit application using: 
-    - `streamlit run home.py --server.maxUploadSize=500`.
+    - `streamlit run streamlit/home.py --server.maxUploadSize=500`.
 
 > If desired, refer to the provided documentation, including the project proposal, reference paper, presentation slides, and project report, for detailed information on the project's background, objectives, and findings.
 
